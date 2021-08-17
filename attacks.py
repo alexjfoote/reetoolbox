@@ -1,11 +1,18 @@
 from abc import ABC, abstractmethod
 import torch
 from torch.autograd import Variable
-from norms import Norms
+import copy
+from constraints import Constraints
+
 
 class Attack(ABC):
-    def __init__(self, parameters):
-        self.parameters = parameters
+    def __init__(self, model, Transform, hyperparameters, transform_hyperparameters, device="cuda:0"):
+        self.model = model
+        self.Transform = Transform
+        self.hyperparameters = hyperparameters
+        self.transform_hyperparameters = transform_hyperparameters
+        self.device = device
+        self.transform = None
 
     @abstractmethod
     def run_attack(self):
@@ -13,64 +20,70 @@ class Attack(ABC):
 
 
 class PGD(Attack):
-    def run_attack(self, model, inputs, labels=None, target_classes=None):
-        epsilon = self.parameters["epsilon"]
-        steps = self.parameters["steps"]
-        norm = self.parameters["norm"]
-        C = self.parameters["C"]
-        margin = self.parameters["margin"]
-        input_range = self.parameters["input_range"]
+    def run_attack(self, inputs, labels=None, target_classes=None):
+        epsilon = self.hyperparameters["epsilon"]
+        steps = self.hyperparameters["steps"]
+        constraint = self.hyperparameters["constraint"]
+        C = self.hyperparameters["C"]
+        input_range = self.hyperparameters["input_range"]
 
-        if norm is not None:
-            norm_func = getattr(Norms, norm)
-            norms = Norms
+        if constraint is not None:
+            constraint_func = getattr(Constraints, constraint)
+            constraints = Constraints
 
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        inputs = inputs.to(self.device)
 
-        inputs = inputs.to(device)
+        self.transform = self.Transform(input_shape=inputs.shape, device=self.device, **self.transform_hyperparameters)
 
-        for param in model.parameters():
+        in_train_mode = self.model.training
+        self.model.eval()
+
+        grads = []
+        for param in self.model.parameters():
+            grads.append(param.requires_grad)
             param.requires_grad = False
 
-        shape = inputs.shape
-        noise_range = 0.5
-        perturbation = torch.FloatTensor(shape).uniform_(-noise_range, noise_range).to(device)
-        perturbation = Variable(perturbation, requires_grad=True)
-
-        opt = torch.optim.RMSprop([perturbation], lr=epsilon)
-
-        count = 0
+        opt = torch.optim.RMSprop([self.transform.weights], lr=epsilon)
 
         for i in range(steps):
-            count += 1
             opt.zero_grad()
-            adv_inputs = torch.clamp(inputs + perturbation, *input_range)
 
             if labels is None:
-                outputs = model(inputs)
+                outputs = self.model(inputs)
                 labels = torch.argmax(labels, dim=1)
 
-            adv_outputs = model(adv_inputs)
+            original_inputs = copy.deepcopy(inputs)
+            adv_inputs = self.transform.forward(inputs)
+            inputs = original_inputs
+            adv_outputs = self.model(adv_inputs)
 
             if target_classes is None:
                 adv_outputs = adv_outputs.gather(1, labels.unsqueeze(1))[:, 0]
-                loss = torch.max(margin - (1 - adv_outputs), torch.zeros_like(labels))
+                loss = adv_outputs
             else:
                 num_classes = list(adv_outputs.shape)[1]
                 all_out = torch.sum(adv_outputs, dim=1)
                 target_out = adv_outputs.gather(1, target_classes)[:, 0]
                 avg_out = (all_out / num_classes) - target_out
+                loss = avg_out
 
-            loss.backward(torch.ones_like(loss), retain_graph=True)
+            loss.backward(torch.ones_like(loss), retain_graph=False)
             opt.step()
 
-            if norm is not None:
+            if constraint is not None:
                 with torch.no_grad():
-                    perturbation = norm_func(norms, perturbation, C)
+                    perturbation = self.transform.weights - self.transform.base_weights
+                    perturbation = constraint_func(constraints, perturbation, C)
+                    self.transform.weights += -self.transform.weights + self.transform.base_weights + perturbation
 
-        for param in model.parameters():
-            param.requires_grad = True
+        original_inputs = copy.deepcopy(inputs)
+        adv_inputs = self.transform.forward(inputs)
+        inputs = original_inputs
 
-        adv_inputs = torch.clamp(inputs + perturbation, *input_range)
+        for i, param in enumerate(self.model.parameters()):
+            param.requires_grad = grads[i]
 
-        return adv_inputs
+        if in_train_mode:
+            self.model.train()
+
+        return inputs, adv_inputs
