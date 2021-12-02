@@ -3,17 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import copy
+from optimisers import targeted_loss, untargeted_loss
 
 
 class Evaluator:
-    def __init__(self, model, dataset, dataloader, TransformOptimiser, Transform, attack_params, trans_params, device="cuda:0"):
+    def __init__(self, model, dataset, dataloader, TransformOptimiser, Transform, optimiser_params, trans_params, criterion=untargeted_loss, device="cuda:0"):
         self.model = model
         self.dataset = dataset
         self.dataloader = dataloader
         self.device = device
         self.trans_params = trans_params
-        self.attack = TransformOptimiser(self.model, Transform, attack_params, trans_params, device=device)
+        self.attack = TransformOptimiser(self.model, Transform, optimiser_params, trans_params, criterion=criterion, device=device)
         self.model.eval()
+        self.criterion = criterion
 
     def predict(self, adversarial, perturbation_measure=None, weight_measure=None):
         outputs = []
@@ -22,19 +24,22 @@ class Evaluator:
         pert_measures = []
         weight_measures = []
 
+        count = 0
+
         for inputs, labels in self.dataloader:
+            count += len(inputs)
             inputs, labels = inputs.to(self.device), labels.to(self.device)
 
             if adversarial:
-                inputs, adv_inputs = self.attack.run_attack(inputs, labels=labels)
+                inputs, adv_inputs = self.attack.run_attack(inputs, targets=labels, reset_weights=True)
                 batch_output = self.model(adv_inputs).cpu().detach()
                 adv_outputs.extend(batch_output)
 
                 if perturbation_measure is not None:
-                    input_pert = adv_inputs - inputs
+                    input_pert = (adv_inputs - inputs).cpu().detach()
                     pert_measures.append(perturbation_measure(input_pert))
                 if weight_measure is not None:
-                    weight_pert = self.attack.transform.weights - self.attack.transform.base_weights
+                    weight_pert = (self.attack.transform.weights - self.attack.transform.base_weights).cpu().detach()
                     weight_measures.append(weight_measure(weight_pert))
 
             batch_output = self.model(inputs).cpu().detach()
@@ -85,7 +90,7 @@ class Evaluator:
 
         return param_values, all_scores
 
-    def attack_inputs(self, input_indices):
+    def attack_inputs(self, input_indices, target_classes=None, criterion=None):
         inputs = []
         labels = []
 
@@ -96,7 +101,12 @@ class Evaluator:
         inputs = torch.stack(inputs).to(self.device)
         labels = torch.stack(labels).to(self.device)
 
-        inputs, adv_inputs = self.attack.run_attack(inputs, labels=labels)
+        if target_classes is not None and criterion is not None:
+            self.attack.criterion = criterion
+            inputs, adv_inputs = self.attack.run_attack(inputs, targets=target_classes, reset_weights=True)
+            self.attack.criterion = self.criterion
+        else:
+            inputs, adv_inputs = self.attack.run_attack(inputs, targets=labels, reset_weights=True)
         return inputs, adv_inputs
 
     def set_attack_hyperparameters(self, hyperparameters):
