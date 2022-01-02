@@ -9,7 +9,7 @@ from skimage.color import rgb2hed, hed2rgb
 
 
 class Transform(ABC):
-    def __init__(self, input_shape, device, **kwargs):
+    def __init__(self, input_shape, device):
         """
         Abstract Transform class
         :param input_shape: shape of input batch
@@ -17,13 +17,12 @@ class Transform(ABC):
         """
         self.input_shape = input_shape
         self.device = device
-        self.base_weights = None
         self.weights = None
 
     @abstractmethod
     def forward(self, x):
         """
-        Performs the differentiable transform on x using self.weights
+        Performs the transform on x using self.weights
         :return: x
         """
         pass
@@ -43,7 +42,7 @@ class PixelTransform(Transform):
 
 
 class StainTransform(Transform):
-    def __init__(self, input_shape, device, input_range=(0, 255)):
+    def __init__(self, input_shape, device, input_range=(0, 255), noise_range=(0, 0)):
         super().__init__(input_shape, device)
         self.max_input_value = input_range[1]
 
@@ -56,6 +55,7 @@ class StainTransform(Transform):
 
         self.weights = np.stack([self.ruiford] * batch_size)
         self.weights = torch.tensor(self.weights).to(device)
+        self.weights += torch.FloatTensor(*self.weights.shape).uniform_(*noise_range).to(device)
         self.weights = Variable(self.weights, requires_grad=True)
 
     def forward(self, x):
@@ -100,7 +100,6 @@ class StainTransform(Transform):
 
     def normalise_matrix(self, matrix):
         return fcn.normalize(matrix).float()
-
 
 class MeanTransform(Transform):
     def __init__(self, input_shape, device, input_range=(0, 255), noise_range=(-0.1, 0.1)):
