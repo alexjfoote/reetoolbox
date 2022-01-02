@@ -149,3 +149,11 @@ def display_results(model, input, adv_input, classes):
 
     return fig
 
+
+def plot_hist(num_epochs, hist, title):
+  plt.figure()
+  plt.plot(range(num_epochs), hist)
+  plt.title(title)
+  plt.xlim([0, num_epochs])
+  plt.ylim([0, 1])
+
