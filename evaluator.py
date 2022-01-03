@@ -31,7 +31,7 @@ class Evaluator:
             inputs, labels = inputs.to(self.device), labels.to(self.device)
 
             if adversarial:
-                inputs, adv_inputs = self.attack.run_attack(inputs, targets=labels, reset_weights=True)
+                inputs, adv_inputs = self.attack.optimise(inputs, targets=labels, reset_weights=True)
                 batch_output = self.model(adv_inputs).cpu().detach()
                 adv_outputs.extend(batch_output)
 
@@ -103,10 +103,10 @@ class Evaluator:
 
         if target_classes is not None and criterion is not None:
             self.attack.criterion = criterion
-            inputs, adv_inputs = self.attack.run_attack(inputs, targets=target_classes, reset_weights=True)
+            inputs, adv_inputs = self.attack.optimise(inputs, targets=target_classes, reset_weights=True)
             self.attack.criterion = self.criterion
         else:
-            inputs, adv_inputs = self.attack.run_attack(inputs, targets=labels, reset_weights=True)
+            inputs, adv_inputs = self.attack.optimise(inputs, targets=labels, reset_weights=True)
         return inputs, adv_inputs
 
     def set_attack_hyperparameters(self, hyperparameters):

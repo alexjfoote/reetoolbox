@@ -12,6 +12,19 @@ from evaluator import Evaluator
 from metrics import get_metrics, rmse
 
 
+def apply_transforms(model, inputs, labels, adv_optimisers, k, reset_weights=True):
+    num = len(adv_optimisers)
+    if num > k:
+        sub_opt = random.sample(adv_optimisers, k)
+    else:
+        sub_opt = adv_optimisers
+
+    for adv_opt in adv_optimisers:
+        adv_opt.model = model
+        _, inputs = adv_opt.optimise(inputs, targets=labels, reset_weights=reset_weights)
+    return inputs
+
+
 def run_val(model, loader, criterion, device="cuda:0"):
     model.eval()
     running_loss = 0.0
@@ -85,9 +98,9 @@ def training_bout(model, train_loader, val_loader, optimizer, criterion, adversa
                         for attack in sub_attacks:
                             attack.model = model
                             if repetition == 0:
-                                _, adv_inputs = attack.run_attack(adv_inputs, targets=labels, reset_weights=True)
+                                _, adv_inputs = attack.optimise(adv_inputs, targets=labels, reset_weights=True)
                             else:
-                                _, adv_inputs = attack.run_attack(adv_inputs, targets=labels, reset_weights=False)
+                                _, adv_inputs = attack.optimise(adv_inputs, targets=labels, reset_weights=False)
 
                         outputs = model(adv_inputs)
                     else:
@@ -185,7 +198,7 @@ def evaluation(model, all_evaluator_params, device="cuda:0"):
     get_metrics(results)
 
 
-def train(model_params, optimisers_and_params, train_params, all_evaluator_params, save_path, device):
+def train(model_params, optimisers_and_params, train_params, device):
     new_model, optimizer_ft = load_train(**model_params, device=device)
 
     all_attacks = []

@@ -6,6 +6,7 @@ import torch
 from torch.autograd import Variable
 import torchvision.transforms.functional as TF
 from skimage.color import rgb2hed, hed2rgb
+from utils import *
 
 
 class Transform(ABC):
@@ -368,3 +369,35 @@ class RandomStainTransform(Transform):
 
     def normalise_matrix(self, matrix):
         return fcn.normalize(matrix).float()
+
+
+class JPEGTransform(Transform):
+    def __init__(self, input_shape, device):
+        super().__init__(input_shape, device)
+        self.rounding = diff_round
+        batch_size = self.input_shape[0]
+        self.weights = {
+            "quality": torch.stack([torch.tensor([100.0])] * batch_size).to("cpu")
+        }
+
+    def forward(self, x):
+        '''
+        '''
+        x = x.to("cpu")
+        for key in self.weights:
+            self.weights[key] = self.weights[key].to("cpu")
+
+        for i, _ in enumerate(x):
+            self.factor = quality_to_factor(self.weights["quality"][i].item())
+            self.compress = compress_jpeg(rounding=self.rounding, factor=self.factor)
+            self.decompress = decompress_jpeg(self.input_shape[2], self.input_shape[3], rounding=self.rounding,
+                                              factor=self.factor)
+            x_i = x[i].unsqueeze(0) / 255
+            y, cb, cr = self.compress(x_i)
+            x_i = self.decompress(y, cb, cr)
+            x[i] = x_i[0] * 255
+
+        x = x.to(self.device)
+        for key in self.weights:
+            self.weights[key] = self.weights[key].to(self.device)
+        return x

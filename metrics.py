@@ -50,8 +50,5 @@ def fooling_rate(results):
 def get_metrics(results):
     acc = accuracy(results)
     robust_acc = adversarial_accuracy(results)
-    in_sens = input_sensitivity(results)
-    norm_in_sens = normalised_input_sensitivity(results)
     fool_ratio = fooling_ratio(results)
-    print(
-        f"Accuracy: {acc:.3f}, robust accuracy: {robust_acc:.3f}, fooling ratio: {fool_ratio:.3f}, input sensitivity: {in_sens:.3f}, normalised input sensitivity: {norm_in_sens:.3f}")
+    print(f"Accuracy: {acc:.3f}, robust accuracy: {robust_acc:.3f}, fooling ratio: {fool_ratio:.3f}")

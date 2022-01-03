@@ -31,12 +31,12 @@ class Optimiser(ABC):
         self.criterion = criterion
 
     @abstractmethod
-    def run_attack(self):
+    def optimise(self):
         pass
 
 
 class PGD(Optimiser):
-    def run_attack(self, inputs, targets=None, reset_weights=True):
+    def optimise(self, inputs, targets=None, reset_weights=True):
         epsilon = self.hyperparameters["epsilon"]
         steps = self.hyperparameters["steps"]
         constraint = self.hyperparameters["constraint"]
@@ -97,8 +97,8 @@ class PGD(Optimiser):
         return inputs, adv_inputs
 
 
-class RandomSample(Optimiser):
-    def run_attack(self, inputs, targets=None, reset_weights=True):
+class StochasticSearch(Optimiser):
+    def optimise(self, inputs, targets=None, reset_weights=True):
         samples = self.hyperparameters["samples"]
         weight_ranges = self.hyperparameters["weight_ranges"]
         input_range = self.hyperparameters["input_range"]
