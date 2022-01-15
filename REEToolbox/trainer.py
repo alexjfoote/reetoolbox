@@ -4,12 +4,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from torchvision import datasets, models, transforms
+from torchvision import models
 import time
 import copy
 import random
-from evaluator import Evaluator
-from metrics import get_metrics, rmse
+from REEToolbox.evaluator import Evaluator
+from REEToolbox.metrics import get_metrics, rmse
 
 
 def apply_transforms(model, inputs, labels, adv_optimisers, k, reset_weights=True):
@@ -198,13 +198,11 @@ def evaluation(model, all_evaluator_params, device="cuda:0"):
     get_metrics(results)
 
 
-def train(model_params, optimisers_and_params, train_params, device):
-    new_model, optimizer_ft = load_train(**model_params, device=device)
-
+def train(model, optimizer_ft, optimisers_and_params, train_params, device):
     all_attacks = []
     for TransformOptimiser, attack_params in optimisers_and_params:
-        all_attacks.append(TransformOptimiser(new_model, **attack_params, device=device))
+        all_attacks.append(TransformOptimiser(model, **attack_params, device=device))
 
-    new_model, initial_hist, adv_hist = train_adv_free(model=new_model, optimizer=optimizer_ft, attacks=all_attacks,
+    new_model, initial_hist, adv_hist = train_adv_free(model=model, optimizer=optimizer_ft, attacks=all_attacks,
                                                        **train_params, device=device)
     return new_model

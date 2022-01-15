@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 import torch
-from torch.autograd import Variable
-import copy
-from constraints import Constraints
+from REEToolbox.constraints import Constraints
 
 
 def untargeted_loss(outputs, labels):
