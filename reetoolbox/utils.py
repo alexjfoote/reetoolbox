@@ -48,13 +48,14 @@ def load_folds(folds):
     for images, counts in folds:
         for i, image in enumerate(images):
             cc = counts[i]
-            image, y = label_patch(image, cc)
+            image, label = label_patch(image, cc)
 
-            if y == -1:
+            if label == -1:
                 continue
 
             im = Image.fromarray(np.uint8(image))
             X.append(np.transpose(np.array(im.resize((224, 224))), (2, 0, 1)))
+            y.append(label)
             all_counts.append(cc)
 
     X = np.array(X)
