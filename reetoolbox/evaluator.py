@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import copy
-from optimisers import targeted_loss, untargeted_loss
+from reetoolbox.optimisers import targeted_loss, untargeted_loss
 
 
 class Evaluator:

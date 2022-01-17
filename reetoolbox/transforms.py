@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import torch
 from torch.autograd import Variable
 import torchvision.transforms.functional as TF
-from REEToolbox.utils import *
+from reetoolbox.utils import *
 
 
 class Transform(ABC):

@@ -1,4 +1,4 @@
-from REEToolbox.transforms import *
+from reetoolbox.transforms import *
 
 # Default evaluation parameters
 eval_samples = 10

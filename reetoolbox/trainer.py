@@ -8,8 +8,8 @@ from torchvision import models
 import time
 import copy
 import random
-from REEToolbox.evaluator import Evaluator
-from REEToolbox.metrics import get_metrics, rmse
+from reetoolbox.evaluator import Evaluator
+from reetoolbox.metrics import get_metrics, rmse
 
 
 def apply_transforms(model, inputs, labels, adv_optimisers, k, reset_weights=True):
