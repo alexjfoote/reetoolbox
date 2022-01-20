@@ -1,5 +1,6 @@
 # Robustness Evaluation and Enhancement Toolbox
 
+## Description
 The Robustness Evaluation and Enhancement Toolbox (REEToolbox) provides tools for measuring and improving the robustness of ML models. REEToolbox uses adversarial transforms - data transforms that are adversarially optimised to fool a model - to generate challenging transformations of input data. For example, in the image below a transform that simulates changing the staining of a tissue image has been optimised to cause a trained model to misclassify a patch of tumorous tissue as non-tumorous. 
 
 ![An example of using an adversarial transform to modify the staining of an image](https://github.com/alexjfoote/reetoolbox/blob/main/example_image.png?raw=true)
