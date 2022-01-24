@@ -34,7 +34,8 @@ Install the toolbox:
 Perform a robustness evaluation:
 
 ```
-# import a transform, an optimiser, the evaluator class, a metric function, and the default evaluation parameters
+# import a transform, an optimiser, the evaluator class, a metric function, and the 
+# default evaluation parameters
 from reetoolbox.transforms import StainTransform
 from reetoolbox.optimisers import PGD
 from reetoolbox.evaluator import Evaluator
