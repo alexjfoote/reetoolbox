@@ -4,6 +4,7 @@ import torch
 from torch.autograd import Variable
 import torchvision.transforms.functional as TF
 from reetoolbox.utils import *
+import numpy as np
 
 
 class Transform(ABC):
@@ -217,8 +218,8 @@ class ZoomInTransform(Transform):
             scale = self.weights["scale"][i].item()
             big = TF.resize(x[i], (int(self.input_shape[2] * scale), int(self.input_shape[3] * scale)))
 
-            top = int(torch.FloatTensor(1).uniform_(0, big.shape[1] - self.input_shape[2]).to(device).item())
-            left = int(torch.FloatTensor(1).uniform_(0, big.shape[2] - self.input_shape[3]).to(device).item())
+            top = int(torch.FloatTensor(1).uniform_(0, big.shape[1] - self.input_shape[2]).to(self.device).item())
+            left = int(torch.FloatTensor(1).uniform_(0, big.shape[2] - self.input_shape[3]).to(self.device).item())
 
             x[i] = TF.crop(big, top=top, left=left, height=self.input_shape[2], width=self.input_shape[3])
         return x

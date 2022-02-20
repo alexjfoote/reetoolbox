@@ -1,15 +1,19 @@
 from reetoolbox.transforms import *
 
+# TODO make it easy to change all common parameters at once (e.g., change input_range from (0, 255) to (0, 1) everywhere
+# Or make them specifiable in only one place
+
 # Default evaluation parameters
 eval_samples = 10
 eval_steps = 10
+input_range = (0, 255)
 
 eval_rotate_optimiser_params = {
     "samples": eval_samples,
     "weight_ranges": {
         "angle": (0, 360)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_rotate_transform_params = {
 }
@@ -19,7 +23,7 @@ eval_zoom_out_optimiser_params = {
     "weight_ranges": {
         "scale": (0.5, 0.95)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_zoom_out_transform_params = {
 }
@@ -31,7 +35,7 @@ eval_hed_optimiser_params = {
         "alpha": (1 - sigma, 1 + sigma),
         "beta": (-sigma, sigma)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_hed_transform_params = {
 }
@@ -41,10 +45,10 @@ eval_mean_optimiser_params = {
     "steps": eval_steps,
     "constraint": "l2",
     "C": 50,
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_mean_transform_params = {
-    "input_range": (0, 255),
+    "input_range": input_range,
     "noise_range": (-0.2, 0.2)
 }
 
@@ -53,7 +57,7 @@ eval_zoom_in_optimiser_params = {
     "weight_ranges": {
         "scale": (1.1, 2)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_zoom_in_transform_params = {
 }
@@ -66,7 +70,7 @@ eval_crop_optimiser_params = {
         "height": (150, 200),
         "width": (150, 200)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_crop_transform_params = {
 }
@@ -81,7 +85,7 @@ eval_blur_optimiser_params = {
         "kernel_size": (1, 10),
         "sigma": (3, 20)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_blur_transform_params = {
 }
@@ -91,10 +95,10 @@ eval_pixel_optimiser_params = {
     "steps": eval_steps,
     "constraint": "l2",
     "C": 2,
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_pixel_transform_params = {
-    "input_range": (0, 255),
+    "input_range": input_range,
     "noise_range": (-0.2, 0.2)
 }
 
@@ -103,10 +107,10 @@ eval_stain_optimiser_params = {
     "steps": eval_steps,
     "constraint": "l2",
     "C": 0.2,
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_stain_transform_params = {
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 
 eval_random_stain_optimiser_params = {
@@ -114,10 +118,10 @@ eval_random_stain_optimiser_params = {
     "weight_ranges": {
         "weights": (-0.25, 0.25)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_random_stain_transform_params = {
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 
 eval_identity_optimiser_params = {
@@ -125,10 +129,10 @@ eval_identity_optimiser_params = {
     "steps": 0,
     "constraint": "l2",
     "C": 0.2,
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_identity_transform_params = {
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 
 eval_jpeg_optimiser_params = {
@@ -136,7 +140,7 @@ eval_jpeg_optimiser_params = {
     "weight_ranges": {
         "quality": (5, 20)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 eval_jpeg_transform_params = {
 }
@@ -150,7 +154,7 @@ train_rotate_optimiser_params = {
     "weight_ranges": {
         "angle": (0, 360)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_rotate_transform_params = {
 }
@@ -160,7 +164,7 @@ train_zoom_out_optimiser_params = {
     "weight_ranges": {
         "scale": (0.5, 0.95)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_zoom_out_transform_params = {
 }
@@ -172,7 +176,7 @@ train_hed_optimiser_params = {
         "alpha": (1 - sigma, 1 + sigma),
         "beta": (-sigma, sigma)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_hed_transform_params = {
 }
@@ -182,10 +186,10 @@ train_mean_optimiser_params = {
     "steps": train_steps,
     "constraint": "l2",
     "C": 50,
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_mean_transform_params = {
-    "input_range": (0, 255),
+    "input_range": input_range,
     "noise_range": (-0.2, 0.2)
 }
 
@@ -194,7 +198,7 @@ train_zoom_in_optimiser_params = {
     "weight_ranges": {
         "scale": (1.1, 2)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_zoom_in_transform_params = {
 }
@@ -207,7 +211,7 @@ train_crop_optimiser_params = {
         "height": (150, 200),
         "width": (150, 200)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_crop_transform_params = {
 }
@@ -222,7 +226,7 @@ train_blur_optimiser_params = {
         "kernel_size": (1, 10),
         "sigma": (3, 20)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_blur_transform_params = {
 }
@@ -232,10 +236,10 @@ train_pixel_optimiser_params = {
     "steps": train_steps,
     "constraint": "l2",
     "C": 2,
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_pixel_transform_params = {
-    "input_range": (0, 255),
+    "input_range": input_range,
     "noise_range": (-0.2, 0.2)
 }
 
@@ -244,10 +248,10 @@ train_stain_optimiser_params = {
     "steps": train_steps,
     "constraint": "l2",
     "C": 0.5,
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_stain_transform_params = {
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 
 train_random_stain_optimiser_params = {
@@ -255,10 +259,10 @@ train_random_stain_optimiser_params = {
     "weight_ranges": {
         "weights": (-0.25, 0.25)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_random_stain_transform_params = {
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 
 train_identity_optimiser_params = {
@@ -266,10 +270,10 @@ train_identity_optimiser_params = {
     "steps": 0,
     "constraint": "l2",
     "C": 0.2,
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_identity_transform_params = {
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 
 train_jpeg_optimiser_params = {
@@ -277,7 +281,7 @@ train_jpeg_optimiser_params = {
     "weight_ranges": {
         "quality": (5, 20)
     },
-    "input_range": (0, 255)
+    "input_range": input_range
 }
 train_jpeg_transform_params = {
 }

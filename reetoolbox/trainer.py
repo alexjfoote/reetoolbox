@@ -19,7 +19,7 @@ def apply_transforms(model, inputs, labels, adv_optimisers, k, reset_weights=Tru
     else:
         sub_opt = adv_optimisers
 
-    for adv_opt in adv_optimisers:
+    for adv_opt in sub_opt:
         adv_opt.model = model
         _, inputs = adv_opt.optimise(inputs, targets=labels, reset_weights=reset_weights)
     return inputs
@@ -142,7 +142,7 @@ def training_bout(model, train_loader, val_loader, optimizer, criterion, adversa
                             best_acc = epoch_acc_v
                             best_model_wts = copy.deepcopy(model.state_dict())
 
-                        acc_history.append(np.array([epoch_acc, epoch_acc_v]))
+                        acc_history.append(np.array([epoch_acc.cpu().detach(), epoch_acc_v.cpu().detach()]))
 
     print(f"Took: {round(time.time() - t_full, 2)}s")
     print(f'Best val Acc: {best_acc}')
