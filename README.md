@@ -31,6 +31,9 @@ Install the toolbox:
 
 `pip install reetoolbox`
 
+Or install from Github for the newest changes:
+`pip install git+https://github.com/alexjfoote/reetoolbox`
+
 Perform a robustness evaluation:
 
 ```
