@@ -52,3 +52,4 @@ def get_metrics(results):
     robust_acc = adversarial_accuracy(results)
     fool_ratio = fooling_ratio(results)
     print(f"Accuracy: {acc:.3f}, robust accuracy: {robust_acc:.3f}, fooling ratio: {fool_ratio:.3f}")
+    return acc, robust_acc, fool_ratio

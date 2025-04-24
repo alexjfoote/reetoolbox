@@ -48,7 +48,7 @@ class StainTransform(Transform):
         batch_size = self.input_shape[0]
         self.ruiford = np.array([[0.65, 0.70, 0.29],
                                  [0.07, 0.99, 0.11],
-                                 [0.27, 0.57, 0.78]], dtype=np.float)
+                                 [0.27, 0.57, 0.78]], dtype=np.float64)
         self.base_weights = np.stack([self.ruiford] * batch_size)
         self.base_weights = torch.tensor(self.base_weights).to(device)
 
@@ -261,7 +261,7 @@ class HEDTransform(Transform):
         self.max_input_value = input_range[1]
         self.ruifrock = torch.tensor(np.array([[0.65, 0.70, 0.29],
                                  [0.07, 0.99, 0.11],
-                                 [0.27, 0.57, 0.78]], dtype=np.float)).to(device)
+                                 [0.27, 0.57, 0.78]], dtype=np.float64)).to(device)
 
     def forward(self, x):
         x = (x / self.max_input_value).float()
@@ -317,7 +317,7 @@ class RandomStainTransform(Transform):
         batch_size = self.input_shape[0]
         self.ruiford = np.array([[0.65, 0.70, 0.29],
                                  [0.07, 0.99, 0.11],
-                                 [0.27, 0.57, 0.78]], dtype=np.float)
+                                 [0.27, 0.57, 0.78]], dtype=np.float64)
         self.base_weights = np.stack([self.ruiford] * batch_size)
         self.base_weights = torch.tensor(self.base_weights).to(device)
 
